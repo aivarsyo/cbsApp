@@ -12,15 +12,22 @@ import { signOut } from "firebase/auth";
 import { useNavigation } from "@react-navigation/core";
 import { ref, child, get } from "firebase/database";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  setUserName,
+  setUserEmail,
+  setUserID,
+} from "../store/actions/userActions";
 
 export default function Menu() {
+  const { name, email, id } = useSelector((state) => state.userReducer);
+  const dispatch = useDispatch();
   const navigation = useNavigation();
-  const [userEmail, setUserEmail] = useState("");
-  const [userName, setUserName] = useState("");
 
   useEffect(() => {
     // do the function every time "menu" is opened
     const unsubscribe = navigation.addListener("focus", () => {
+      //id == "" ? getUserData() : console.log("state exists");
       getUserData();
       return unsubscribe;
     });
@@ -29,18 +36,22 @@ export default function Menu() {
   const getUserData = async () => {
     try {
       // get user id from async storage
-      const value = await AsyncStorage.getItem("@user_id");
-      if (value !== null) {
+      const userID = await AsyncStorage.getItem("@user_id");
+      if (userID !== null) {
         // with the user id select the user from database
         const dbRef = ref(database);
-        get(child(dbRef, `users/${value}`))
+        get(child(dbRef, `users/${userID}`))
           .then((snapshot) => {
             if (snapshot.exists()) {
               //console.log(snapshot.val());
-              const data = snapshot.val();
-              // with data retrieved from db, set it in variables
-              setUserEmail(data.email);
-              setUserName(data.name);
+              const user = snapshot.val();
+              // with data retrieved from db, set it in state
+
+              console.log(user);
+              /* dispatch(setUserName(user.name));
+              dispatch(setUserEmail(user.email));
+              dispatch(setUserID(userID)); */
+              //topLevelAction(user, userID)
             } else {
               console.log("No data available");
             }
@@ -50,10 +61,14 @@ export default function Menu() {
           });
       }
     } catch (e) {
-      // error reading value
-      alert(e);
+      //alert(e);
+      console.error(e);
     }
   };
+
+  const topLevelAction = (user, userID) => dispatch => {
+    return Promise.all([dispatch(setUserName(user.name)), dispatch(setUserEmail(user.email)), dispatch(setUserID(userID))])
+}
 
   const signOutUser = () => {
     signOut(authentication)
@@ -68,8 +83,9 @@ export default function Menu() {
       <TouchableOpacity onPress={signOutUser} style={styles.button}>
         <Text style={styles.buttonText}>Sign Out</Text>
       </TouchableOpacity>
-      <Text>{userEmail}</Text>
-      <Text>{userName}</Text>
+      <Text>{email}</Text>
+      <Text>{name}</Text>
+      <Text>{id}</Text>
     </View>
   );
 }

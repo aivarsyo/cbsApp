@@ -15,10 +15,16 @@ import {
 import { useNavigation } from "@react-navigation/core";
 import { ref, set } from "firebase/database";
 import { storeData } from "../entities/AsyncStorage";
+import {
+  setUserName,
+  setUserEmail,
+  setUserID,
+} from "../store/actions/userActions";
+import { useSelector, useDispatch } from "react-redux";
 
 const Signup = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const { name, email, id } = useSelector((state) => state.userReducer);
+  const dispatch = useDispatch();
   const [password, setPassword] = useState("");
 
   const navigation = useNavigation();
@@ -45,6 +51,7 @@ const Signup = () => {
         });
 
         storeData("@user_id", user.uid);
+        dispatch(setUserID(user.uid));
       })
       .catch((error) => alert(error.message));
   };
@@ -55,13 +62,13 @@ const Signup = () => {
         <TextInput
           placeholder="Full name"
           value={name}
-          onChangeText={(text) => setName(text)}
+          onChangeText={(text) => dispatch(setUserName(text))}
           style={styles.input}
         ></TextInput>
         <TextInput
           placeholder="Email"
           value={email}
-          onChangeText={(text) => setEmail(text)}
+          onChangeText={(text) => dispatch(setUserEmail(text))}
           style={styles.input}
         ></TextInput>
         <TextInput
@@ -141,8 +148,8 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontSize: 16,
   },
-  userExists:{
+  userExists: {
     display: "flex",
     flexDirection: "row",
-  }
+  },
 });
