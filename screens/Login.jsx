@@ -8,32 +8,14 @@ import {
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { authentication } from "../firebase";
-import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigation } from "@react-navigation/core";
 import { storeData } from "../entities/AsyncStorage";
-import {
-  setUserName,
-  setUserEmail,
-  setUserID,
-} from "../store/actions/userActions";
-import { useSelector, useDispatch } from "react-redux";
 
 const Login = () => {
-  //const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { name, email, id } = useSelector((state) => state.userReducer);
-  const dispatch = useDispatch();
-
   const navigation = useNavigation();
-
-  useEffect(() => {
-    const unsubcribe = onAuthStateChanged(authentication, (user) => {
-      if (user) {
-        navigation.navigate("LoggedIn");
-      }
-    });
-    return unsubcribe;
-  });
 
   const handleLogin = () => {
     signInWithEmailAndPassword(authentication, email, password)
@@ -41,7 +23,6 @@ const Login = () => {
         const user = userCredentials.user;
         console.log("Logged in with", user.email);
         storeData("@user_id", user.uid);
-        dispatch(setUserID(user.uid));
       })
       .catch((error) => alert(error.message));
   };
@@ -52,7 +33,7 @@ const Login = () => {
         <TextInput
           placeholder="Email"
           value={email}
-          onChangeText={(text) => dispatch(setUserEmail(text))}
+          onChangeText={(text) => setEmail(text)}
           style={styles.input}
         ></TextInput>
         <TextInput

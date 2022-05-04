@@ -9,34 +9,22 @@ import {
 import React, { useState, useEffect } from "react";
 import { authentication, database } from "../firebase";
 import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
+  createUserWithEmailAndPassword
+
 } from "firebase/auth";
 import { useNavigation } from "@react-navigation/core";
 import { ref, set } from "firebase/database";
 import { storeData } from "../entities/AsyncStorage";
-import {
-  setUserName,
-  setUserEmail,
-  setUserID,
-} from "../store/actions/userActions";
-import { useSelector, useDispatch } from "react-redux";
+import {SignupUser} from "../store/actions/userActions";
+import { useDispatch } from "react-redux";
 
 const Signup = () => {
-  const { name, email, id } = useSelector((state) => state.userReducer);
   const dispatch = useDispatch();
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState("");
+  const [name, setName] = useState('')
 
   const navigation = useNavigation();
-
-  useEffect(() => {
-    const unsubcribe = onAuthStateChanged(authentication, (user) => {
-      if (user) {
-        navigation.navigate("LoggedIn");
-      }
-    });
-    return unsubcribe;
-  });
 
   const handleSignup = () => {
     createUserWithEmailAndPassword(authentication, email, password)
@@ -51,7 +39,7 @@ const Signup = () => {
         });
 
         storeData("@user_id", user.uid);
-        dispatch(setUserID(user.uid));
+        dispatch(SignupUser(name, email, user.uid));
       })
       .catch((error) => alert(error.message));
   };
@@ -62,13 +50,13 @@ const Signup = () => {
         <TextInput
           placeholder="Full name"
           value={name}
-          onChangeText={(text) => dispatch(setUserName(text))}
+          onChangeText={(text) => setName(text)}
           style={styles.input}
         ></TextInput>
         <TextInput
           placeholder="Email"
           value={email}
-          onChangeText={(text) => dispatch(setUserEmail(text))}
+          onChangeText={(text) => setEmail(text)}
           style={styles.input}
         ></TextInput>
         <TextInput

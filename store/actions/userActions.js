@@ -1,24 +1,25 @@
+export const RESTORE_USER = 'RESTORE_USER';
+export const SIGNUP_USER = 'SIGNUP_USER';
+export const RESET_USER = 'RESET_USER';
+export const SET_USER_PHOTO = 'SET_USER_PHOTO';
 export const SET_USER_NAME = 'SET_USER_NAME';
-export const SET_USER_EMAIL = 'SET_USER_EMAIL';
-export const SET_USER_ID = 'SET_USER_ID';
 
-export const setUserName = name => dispatch =>{
-    dispatch({
-        type: SET_USER_NAME,
-        payload: name,
-    })
+export const RestoreUser = (user, userID, userPhoto) => dispatch => {
+    dispatch( { type: RESTORE_USER, payload: {user, userID, userPhoto }})
 }
 
-export const setUserEmail = email => dispatch =>{
-    dispatch({
-        type: SET_USER_EMAIL,
-        payload: email,
-    })
+export const SignupUser = (userName, userEmail, userID) => dispatch => {
+    dispatch( { type: SIGNUP_USER, payload: {userName, userEmail, userID}})
 }
 
-export const setUserID = id => dispatch =>{
-    dispatch({
-        type: SET_USER_ID,
-        payload: id,
-    })
+export const ResetUser = () => dispatch => {
+    dispatch( { type: RESET_USER})
+}
+
+export const SetUserPhoto = (photo) => dispatch => {
+    dispatch( { type: SET_USER_PHOTO, payload: photo})
+}
+
+export const SetUserName = (name) => dispatch => {
+    dispatch( { type: SET_USER_NAME, payload: name})
 }

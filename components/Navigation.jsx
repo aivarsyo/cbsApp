@@ -3,23 +3,44 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Discover from "../screens/discover";
 import Chat from "../screens/chat";
-import Menu from "../screens/menu";
+import Profile from "../screens/Profile";
+import EditProfile from "../screens/EditProfile";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Signup from "../screens/Signup";
 import Login from "../screens/Login";
 import LoggedIn from "../screens/LoggedIn";
+import Home from "../screens/home"
+import { useSelector, useDispatch } from "react-redux";
+import React, { useState, useEffect } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { storeData } from "../entities/AsyncStorage";
+import {onAuthStateChanged} from "firebase/auth";
+import { authentication } from "../firebase";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 export default function NavigationComponent() {
+
+    const [token, setToken] = useState(undefined)
+    
+    useEffect(() => {
+      const unsubcribe = onAuthStateChanged(authentication, (user) => {
+        user ? setToken(1) : setToken(undefined)
+      });
+      return unsubcribe;
+    });
+    
   return (
+      
     <NavigationContainer>
+        {token !== undefined ?(
       <Tab.Navigator
         screenOptions={() => ({
           tabBarActiveTintColor: "#5050A5",
           tabBarInactiveTintColor: "#B7B7B7",
+          headerShown: false,
           tabBarLabelStyle: {
             fontSize: 15,
             textTransform: "uppercase",
@@ -28,7 +49,7 @@ export default function NavigationComponent() {
       >
         <Tab.Screen
           name="Home"
-          component={LoginSignupStack}
+          component={Home}
           options={{
             tabBarIcon: ({ focused }) => (
               <Ionicons
@@ -64,7 +85,7 @@ export default function NavigationComponent() {
         />
         <Tab.Screen
           name="Menu"
-          component={Menu}
+          component={MenuStack}
           options={{
             tabBarIcon: ({ focused }) => (
               <Ionicons
@@ -75,24 +96,35 @@ export default function NavigationComponent() {
           }}
         />
       </Tab.Navigator>
+        ) : (
+            <Stack.Navigator>
+            <Stack.Screen
+              name="Signup"
+              options={{ headerShown: false }}
+              component={Signup}
+            />
+            <Stack.Screen
+              name="Login"
+              options={{ headerShown: false }}
+              component={Login}
+            />
+          </Stack.Navigator>
+        )}
     </NavigationContainer>
   );
 }
 
-function LoginSignupStack() {
+function MenuStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Signup"
-        options={{ headerShown: false }}
-        component={Signup}
+        name="Profile"
+        component={Profile}
       />
       <Stack.Screen
-        name="Login"
-        options={{ headerShown: false }}
-        component={Login}
+        name="Edit Profile"
+        component={EditProfile}
       />
-      <Stack.Screen name="LoggedIn" component={LoggedIn} />
     </Stack.Navigator>
   );
 }
