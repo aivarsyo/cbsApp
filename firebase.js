@@ -4,19 +4,20 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 import { getStorage } from 'firebase/storage';
-import { getFirestore } from 'firebase/firestore/lite';
+import { getFirestore } from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBuqrJKagnNsLS-J0JmeeJgcefOiBqX4N0",
-  authDomain: "cbsstudentsweb2.firebaseapp.com",
-  projectId: "cbsstudentsweb2",
-  storageBucket: "cbsstudentsweb2.appspot.com",
-  messagingSenderId: "726583175007",
-  appId: "1:726583175007:web:d3ebde64071b975e7a38ea",
-  databaseURL: "https://cbsstudentsweb2-default-rtdb.europe-west1.firebasedatabase.app",
+  apiKey: "AIzaSyA30QjRX4F9IeqlpyHK5znNQGn2uXALFYo",
+  authDomain: "cbsstudentsweb-7953a.firebaseapp.com",
+  databaseURL: "https://cbsstudentsweb-7953a-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "cbsstudentsweb-7953a",
+  storageBucket: "cbsstudentsweb-7953a.appspot.com",
+  messagingSenderId: "871703630749",
+  appId: "1:871703630749:web:e10978c4948bd0cf681574"
+  //databaseURL: "https://cbsstudentsweb2-default-rtdb.europe-west1.firebasedatabase.app",
 };
 
 // Initialize Firebase

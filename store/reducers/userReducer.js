@@ -4,6 +4,7 @@ import {
   RESET_USER,
   SET_USER_PHOTO,
   SET_USER_NAME,
+  SET_CHAT_ID
 } from "../actions/userActions";
 
 const initialState = {
@@ -11,6 +12,7 @@ const initialState = {
   email: undefined,
   id: undefined,
   photo: undefined,
+  chatID: undefined
 };
 
 function userReducer(state = initialState, action) {
@@ -36,6 +38,8 @@ function userReducer(state = initialState, action) {
       return { ...state, photo: action.payload };
     case SET_USER_NAME:
       return { ...state, name: action.payload };
+      case SET_CHAT_ID:
+      return { ...state, chatID: action.payload };
     default:
       return state;
   }

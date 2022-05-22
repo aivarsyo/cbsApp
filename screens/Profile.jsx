@@ -6,147 +6,177 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  ScrollView,
+  Switch,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import { authentication, database, storage } from "../firebase";
+import { authentication } from "../firebase";
 import { signOut } from "firebase/auth";
 import { useNavigation } from "@react-navigation/core";
-import { ref, child, get } from "firebase/database";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { removeData, storeData } from "../entities/AsyncStorage";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  RestoreUser,
-  ResetUser,
-  SetUserPhoto,
-} from "../store/actions/userActions";
-import { useFocusEffect } from "@react-navigation/native";
-import { ref as sRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ResetUser } from "../store/actions/userActions";
 const avatar = require("../assets/avatar.png");
+import RoundPhoto from "../components/general/RoundPhoto";
 
 export default function Profile() {
   const { name, email, id, photo } = useSelector((state) => state.userReducer);
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
-  /* useFocusEffect(
-    React.useCallback(() => {
-      //alert('Screen was focused');
-      // Do something when the screen is focused
-      console.log(id)
-      id == undefined ? getUserData() : console.log("state exists");
-      return () => {
-        //alert('Screen was unfocused');
-        // Do something when the screen is unfocused
-        // Useful for cleanup functions
-      };
-    }, [])) */
-
-  useEffect(() => {
-    id == undefined ? getUserData() : console.log("state exists");
-  });
-
-  const getUserData = async () => {
-    try {
-      // get user id from async storage
-      const userID = await AsyncStorage.getItem("@user_id");
-      if (userID !== null) {
-        // with the user id select the user from database
-        const dbRef = ref(database);
-        get(child(dbRef, `users/${userID}`))
-          .then((snapshot) => {
-            if (snapshot.exists()) {
-              //console.log(snapshot.val());
-              const user = snapshot.val();
-              // with data retrieved from db, set it in state
-
-              console.log(user);
-              //dispatch(RestoreUser(user, userID))
-              getProfilePhoto(user, userID);
-            } else {
-              console.log("No data available");
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      }
-    } catch (e) {
-      //alert(e);
-      console.error(e);
-    }
-  };
-
-  const getProfilePhoto = async (user, userID) => {
-    //console.log(id)
-    const storageRef = sRef(storage, "userProfileImages/" + userID + ".jpg");
-    await getDownloadURL(storageRef)
-      .then((photoURL) => {
-        console.log(photoURL);
-        dispatch(RestoreUser(user, userID, photoURL));
-      })
-      .catch((error) => {
-        switch (error.code) {
-          case "storage/object-not-found":
-            // File doesn't exist
-            dispatch(RestoreUser(user, userID, undefined));
-            break;
-        }
-      });
-  };
-
   const signOutUser = () => {
     signOut(authentication)
       .then(() => {
         console.log("sign out");
         dispatch(ResetUser());
-        //navigation.navigate("Login");
       })
       .catch((error) => alert(error.message));
   };
 
   return (
-    <View>
-      {photo == undefined ? (
-        <Image
-          style={{ width: 100, height: 100, borderRadius: 50 }}
-          source={avatar}
-        />
-      ) : (
-        <Image
-          style={{ width: 100, height: 100, borderRadius: 50 }}
-          source={{ uri: photo }}
-        />
-      )}
-      <Text>{email}</Text>
-      <Text>{name}</Text>
-      <Text>{id}</Text>
-      <TouchableOpacity
-        onPress={() => {
-          navigation.navigate("Edit Profile");
-        }}
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>Edit profile</Text>
+    <ScrollView style={{ paddingHorizontal: 15, minHeight: "100%" }}>
+      <View style={styles.topSection}>
+        <View style={styles.topSectionRowLine}>
+          <RoundPhoto source={photo == undefined ? avatar : { uri: photo }} />
+          <View style={styles.textContainer}>
+            <Text style={styles.userName}>{name}</Text>
+            <Text style={styles.smallText}>{email}</Text>
+            <Text style={styles.smallText}>
+              MSc in Business Administration and E-business
+            </Text>
+          </View>
+        </View>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("Edit Profile");
+          }}
+          style={styles.editButton}
+        >
+          <Text style={styles.editText}>Edit profile</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.notificationsContainer}>
+        <Text style={styles.notifTitle}>Notifications</Text>
+        <View style={styles.box}>
+          <View style={styles.boxTextContainer}>
+            <Text style={styles.boxBigText}>Chat</Text>
+            <Text style={styles.boxSmallText}>
+              When you receive a new message
+            </Text>
+          </View>
+          <Switch
+            value={true}
+            trackColor={{ false: "#D4D4D4", true: "#DCDDEE" }}
+            thumbColor={"#5050A5"}
+          />
+        </View>
+        <View style={styles.box}>
+          <View style={styles.boxTextContainer}>
+            <Text style={styles.boxBigText}>Event reminder</Text>
+            <Text style={styles.boxSmallText}>
+              An hour before events you are 'going to'
+            </Text>
+          </View>
+          <Switch
+            value={false}
+            trackColor={{ false: "#D4D4D4", true: "#DCDDEE" }}
+            thumbColor={"#ffffff"}
+          />
+        </View>
+      </View>
+      <TouchableOpacity onPress={signOutUser} style={styles.logoutButton}>
+        <Text style={styles.logoutText}>LOG OUT</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={signOutUser} style={styles.button}>
-        <Text style={styles.buttonText}>LOG OUT</Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  button: {
-    backgroundColor: "#0782F9",
-    width: "100%",
-    padding: 15,
-    borderRadius: 10,
+  topSection: {
+    paddingVertical: 20,
+  },
+  topSectionRowLine: {
+    flexDirection: "row",
     alignItems: "center",
   },
-  buttonText: {
+  textContainer: {
+    flexShrink: 1,
+    marginLeft: 20,
+  },
+  userName: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  smallText: {
+    marginTop: 3,
+  },
+  editButton: {
+    backgroundColor: "#5050A5",
+    borderRadius: 5,
+    paddingVertical: 11,
+    alignItems: "center",
+    marginTop: 17,
+  },
+  editText: {
     color: "white",
+    fontWeight: "bold",
+    fontSize: 17,
+  },
+  notificationsContainer: {
+    paddingVertical: 30,
+    borderTopWidth: 2,
+    borderBottomWidth: 2,
+    borderColor: "#E6E6E6",
+  },
+  notifTitle: {
+    textTransform: "uppercase",
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#32305D",
+  },
+  box: {
+    flexDirection: "row",
+    backgroundColor: "white",
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+    marginTop: 25,
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderRadius: 6,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+  boxBigText: {
+    fontSize: 18,
     fontWeight: "700",
-    fontSize: 16,
+    color: "#333333",
+  },
+  boxSmallText: {
+    color: "rgb(112,112,112)",
+  },
+  logoutButton: {
+    backgroundColor: "white",
+    borderRadius: 5,
+    paddingVertical: 25,
+    alignItems: "center",
+    marginTop: 70,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+  logoutText: {
+    color: "#32305D",
+    fontWeight: "bold",
+    fontSize: 22,
   },
 });
