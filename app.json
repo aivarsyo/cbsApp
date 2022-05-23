@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "cbsWebDev2",
-    "slug": "cbsWebDev2",
+    "name": "CBS Student App",
+    "slug": "cbs-student-app",
+    "description": "This is an exam project for KEA Web Development in React Native. Neither the design or idea is mine, but the functionality and code for this app is made by me.",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
