@@ -6,5 +6,5 @@ import { composeWithDevTools } from "redux-devtools-extension";
 
 const rootReducer = combineReducers({userReducer, photosReducer})
 
-//export const Store = createStore(rootReducer, applyMiddleware(thunk));
-export const Store = createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)));
+export const Store = createStore(rootReducer, applyMiddleware(thunk));
+//export const Store = createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)));
